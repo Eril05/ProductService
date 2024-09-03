@@ -1,11 +1,10 @@
-package com.example.demo.controller;
+package com.ecommerce.productservice.controller;
 
 
-import com.example.demo.dto.FakeAPIProductDto;
-import com.example.demo.model.Product;
-import com.example.demo.service.ProductService;
+import com.ecommerce.productservice.dto.ProductDto;
+import com.ecommerce.productservice.model.Product;
+import com.ecommerce.productservice.service.ProductService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,12 +50,12 @@ public class ProductController {
     }
 
     @PutMapping ("/{userId}")
-    public Product replaceProduct(@RequestBody Product product){
-        return new Product();
+    public Product replaceProduct(@PathVariable("userId")Long id, @RequestBody ProductDto productDto){
+        return productService.replaceProduct(id, productDto);
     }
 
-    @PatchMapping("/{userId}")
-    public Product updateProduct(@RequestBody Product product){
-        return new Product();
+    @PatchMapping("hello/{userId}")
+    public Product updateProduct(@PathVariable("userId")Long userId, @RequestBody ProductDto productDto){
+        return productService.updateProduct(userId, productDto);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.ecommerce.productservice.model;
 
 import lombok.Data;
 

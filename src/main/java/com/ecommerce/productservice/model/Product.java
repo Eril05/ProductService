@@ -1,15 +1,15 @@
-package com.example.demo.dto;
-
+package com.ecommerce.productservice.model;
 
 import lombok.Data;
 
+
 @Data
-public class FakeAPIProductDto {
+public class Product {
 
     private Long id;
     private String title;
     private double price;
-    private String category;
+    private Category category;
     private String description;
     private String image;
 }
