@@ -2,6 +2,7 @@ package com.ecommerce.productservice.controller;
 
 
 import com.ecommerce.productservice.dto.ProductDto;
+import com.ecommerce.productservice.exception.InvalidProductIdException;
 import com.ecommerce.productservice.model.Product;
 import com.ecommerce.productservice.service.ProductService;
 import org.springframework.web.bind.annotation.*;
@@ -23,30 +24,26 @@ public class ProductController {
 
 
     @GetMapping("/")
-    public List<Product> getAllProducts (){
+    public List<Product> getAllProducts () {
 
        // System.out.println("Hello");
         List<Product>products=productService.getAllProducts();
+
         if(products==null)
                 return new ArrayList<Product>();
         return products;
     }
 
     @GetMapping("/{userId}")
-    public Product getProduct(@PathVariable(name="userId")Long userId){
+    public Product getProduct(@PathVariable(name="userId")Long userId) throws InvalidProductIdException {
 
-      Product product=  productService.getProduct(userId);
-        if(product==null){
-            return null;
-        }
-        return  product;
+        return  productService.getProduct(userId);
     }
 
-    @PostMapping("/{userId}")
-    public Product addProduct(@PathVariable(name="userId")Long userId,
-                                 @RequestBody Product product){
+    @PostMapping("/")
+    public Product addProduct(@RequestBody Product product){
 
-        return new Product();
+        return productService.addProduct(product);
     }
 
     @PutMapping ("/{userId}")
