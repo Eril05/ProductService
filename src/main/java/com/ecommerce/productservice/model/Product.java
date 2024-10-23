@@ -7,11 +7,11 @@ import lombok.Data;
 @Entity
 public class Product extends BaseModel {
 
-//    @Id
-//    private Long id;
+
     private String title;
     private double price;
     @ManyToOne( cascade = CascadeType.PERSIST)
+   // @JoinColumn(name="category_id")
     private Category category;
     private String description;
     private String image;
