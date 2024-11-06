@@ -6,6 +6,9 @@ import com.ecommerce.productservice.repository.CategoryRepo;
 import com.ecommerce.productservice.repository.ProductRepo;
 import com.ecommerce.productservice.service.ProductService;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +22,18 @@ public class ProductServiceImpl implements ProductService {
 
     private CategoryRepo categoryRepo;
 
+
     public ProductServiceImpl(ProductRepo productRepo, CategoryRepo categoryRepo) {
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
     }
     @Override
-    public List<Product> getAllProducts() {
-        return List.of();
+    public List<Product> getAllProducts(Integer pageNo, Integer pageSize) {
+
+        Pageable pageable= PageRequest.of(pageNo,pageSize, Sort.by("price").descending().and(Sort.by("title").ascending()));
+
+        return productRepo.findAll(pageable).getContent();
+
     }
 
     @Override

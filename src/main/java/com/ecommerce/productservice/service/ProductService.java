@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public interface ProductService {
 
-    public List<Product> getAllProducts () ;
+    public List<Product> getAllProducts (Integer pageNo, Integer pageSize) ;
 
     public Product getProduct(Long userId) ;
 

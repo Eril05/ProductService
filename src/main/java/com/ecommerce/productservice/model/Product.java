@@ -10,7 +10,7 @@ public class Product extends BaseModel {
 
     private String title;
     private double price;
-    @ManyToOne( cascade = CascadeType.PERSIST)
+    @ManyToOne( cascade = CascadeType.MERGE)
    // @JoinColumn(name="category_id")
     private Category category;
     private String description;

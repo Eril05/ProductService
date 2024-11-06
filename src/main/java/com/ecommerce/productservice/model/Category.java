@@ -10,8 +10,8 @@ import java.util.List;
 @Entity
 public class Category extends BaseModel {
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "category",cascade = CascadeType.REMOVE)
-    private List<Product>products;
+//    @OneToMany(fetch = FetchType.EAGER, mappedBy = "category",cascade = CascadeType.REMOVE)
+//    private List<Product>products;
     private String name;
 
 //    public Category(Category category) {

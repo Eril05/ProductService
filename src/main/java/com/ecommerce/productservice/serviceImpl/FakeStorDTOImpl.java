@@ -6,6 +6,7 @@ import com.ecommerce.productservice.model.Category;
 import com.ecommerce.productservice.model.Product;
 import com.ecommerce.productservice.service.ProductService;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -15,26 +16,29 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("fakeStore")
 //@Primary
 public class FakeStorDTOImpl implements ProductService {
 
 
 
-    private  RestTemplate restTemplate;
+    private  RestTemplate externalRestTemplate;
+    private RedisTemplate redisTemplate;
 
-    public FakeStorDTOImpl(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public FakeStorDTOImpl(RestTemplate externalRestTemplate, RedisTemplate redisTemplate) {
+        this.externalRestTemplate = externalRestTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
-    public List<Product> getAllProducts()  {
+    public List<Product> getAllProducts(Integer pageNo, Integer pageSize)  {
 
         ProductDto[] listOfProducts;
 
-        ResponseEntity<ProductDto[]> response =restTemplate.
+        ResponseEntity<ProductDto[]> response =externalRestTemplate.
 
                 exchange("https://fakestoreapi.com/products", HttpMethod.GET,null, ProductDto[].class);
+
 
         //  Option 2  use ParameterizedTypeReference
 
@@ -64,9 +68,17 @@ public class FakeStorDTOImpl implements ProductService {
     }
 
     @Override
-    public Product getProduct(Long userId)    {
+    public Product getProduct(Long productId)    {
 
-        ProductDto productDto = restTemplate.getForObject("https://fakestoreapi.com/products/"+userId, ProductDto.class);
+
+        if(redisTemplate.opsForHash().get("PRODUCT","PRODUCT"+productId)!=null){
+            return (Product) redisTemplate.opsForHash().get("PRODUCT","PRODUCT"+productId);
+        }
+
+
+        ProductDto productDto = externalRestTemplate.getForObject("https://fakestoreapi.com/products/"+productId, ProductDto.class);
+
+
 
         if(productDto==null){
 
@@ -74,6 +86,7 @@ public class FakeStorDTOImpl implements ProductService {
         }
 
         Product product=covertFakeAPIProductDtoToProduct(productDto);
+        redisTemplate.opsForHash().put("PRODUCT","PRODUCT"+productId,product);
         if(product==null){
             return new Product();
         }
@@ -111,7 +124,7 @@ public class FakeStorDTOImpl implements ProductService {
 //        ProductDto productDtoResponseEntity= restTemplate.execute("https://fakestoreapi.com/products/"+id, HttpMethod.PUT, requestCallback, responseExtractor);
 
         HttpEntity<ProductDto> requestEntity = new HttpEntity<>(productDto);
-        ResponseEntity<ProductDto> productDtoResponseEntity=restTemplate.exchange("https://fakestoreapi.com/products/"+id,HttpMethod.PUT,requestEntity,ProductDto.class);
+        ResponseEntity<ProductDto> productDtoResponseEntity=externalRestTemplate.exchange("https://fakestoreapi.com/products/"+id,HttpMethod.PUT,requestEntity,ProductDto.class);
 
         if(productDtoResponseEntity.getBody()!=null)
          return covertFakeAPIProductDtoToProduct(productDtoResponseEntity.getBody());
@@ -123,7 +136,7 @@ public class FakeStorDTOImpl implements ProductService {
     public Product updateProduct(Long userId,ProductDto productDto) {
 
         HttpEntity<ProductDto>requestEntity=new HttpEntity<>(productDto);
-        ResponseEntity<ProductDto> responseProductDto=restTemplate.exchange("https://fakestoreapi.com/products/"+userId,HttpMethod.PATCH,requestEntity,ProductDto.class);
+        ResponseEntity<ProductDto> responseProductDto=externalRestTemplate.exchange("https://fakestoreapi.com/products/"+userId,HttpMethod.PATCH,requestEntity,ProductDto.class);
 
         if(responseProductDto.getBody()!=null)
             return  covertFakeAPIProductDtoToProduct(responseProductDto.getBody());
